@@ -3,6 +3,7 @@ Lightweight dynamic PHP CRUD
 
 Example usage:
 
+```
 $db = new db();
 $user = new user();
 $user->email = "test@skyweb.nu";
@@ -16,3 +17,4 @@ $userGet->email = "test2@skyweb.nu";
 $db->users->update($userGet);
 //delete
 $db->users->delete($userGet);
+```
