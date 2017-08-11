@@ -1,5 +1,6 @@
 <?php
-	require_once("entity.php");
+	require_once(dirname(__FILE__) . "/entity.php");
+
 	class db {
 		public $connection;
 		public $users;

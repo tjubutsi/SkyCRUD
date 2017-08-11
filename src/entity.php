@@ -1,5 +1,5 @@
 <?php
-	foreach (glob('entities/*.php') as $filename)
+	foreach (glob(dirname(__FILE__) . "/entities/*.php") as $filename)
 	{
 		require_once $filename;
 	}
@@ -44,6 +44,7 @@
 			}
 			$object->id = $query->insert_id;
 			$query->close();
+			return true;
 		}
 		
 		function update($object) {
@@ -59,6 +60,7 @@
 				return false;
 			}
 			$query->close();
+			return true;
 		}
 		
 		function delete($object) {
