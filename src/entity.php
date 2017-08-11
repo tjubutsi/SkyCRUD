@@ -39,8 +39,11 @@
 			$columns = implode(", ", $this->parameters);
 			$query = $this->connection->prepare("INSERT INTO {$this->tableName} ({$columns}) VALUES ({$this->parameterPlaceholders})");
 			$this->bindParameters($query, $object);
-			$query->execute();
+			if(!$query->execute()) {
+				return false;
+			}
 			$object->id = $query->insert_id;
+			$query->close();
 		}
 		
 		function update($object) {
@@ -51,20 +54,25 @@
 			$columns = implode(", ", $parameters);
 			$query = $this->connection->prepare("UPDATE {$this->tableName} SET {$columns} WHERE id = {$object->id}");
 			$this->bindParameters($query, $object);
-			$query->execute();
+			if(!$query->execute()) {
+				$query->close();
+				return false;
+			}
+			$query->close();
 		}
 		
 		function delete($object) {
 			$query = $this->connection->prepare("DELETE FROM {$this->tableName} WHERE id = {$object->id}");
 			$query->execute();
+			$query->close();
 		}
 		
 		function get($id) {
 			$result = new $this->entityName;
 			$columns = implode(", ", $this->parameters);
 			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName} WHERE id = ?");
-			foreach($this->parameters as $property) {
-					$resultArray[$property] = &$result->$property;
+			foreach($this->parameters as $parameter) {
+				$resultArray[$parameter] = &$result->$parameter;
 			}
 		
 			call_user_func_array(array($query, 'bind_result'), $resultArray);
@@ -75,9 +83,39 @@
 				$query->fetch();
 			}
 			else {
+				$query->close();
 				return false;
 			}
 			
+			$query->close();
+			return $result;
+		}
+		
+		function where($property, $value) {
+			$reflection = new ReflectionClass($this->entityName);
+			$reflectionProperty = $reflection->getProperty($property);
+			$reflectionProperty->getName();
+			
+			$result = new $this->entityName;
+			$columns = implode(", ", $this->parameters);
+			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName} WHERE {$reflectionProperty->getName()} = ?");
+			foreach($this->parameters as $parameter) {
+				$resultArray[$parameter] = &$result->$parameter;
+			}
+		
+			call_user_func_array(array($query, 'bind_result'), $resultArray);
+			$query->bind_param("s", $value);
+			$query->execute();
+			$query->store_result();
+			if($query->num_rows === 1) {
+				$query->fetch();
+			}
+			else {
+				$query->close();
+				return false;
+			}
+			
+			$query->close();
 			return $result;
 		}
 		
