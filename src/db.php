@@ -1,5 +1,5 @@
 <?php
-	include("entity.php");
+	require_once("entity.php");
 	class db {
 		public $connection;
 		public $users;
