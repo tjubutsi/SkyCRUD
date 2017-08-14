@@ -130,7 +130,7 @@
 			$tmp = array();
 			foreach($parameters as $key => $value) {
 			    $tmp[$key] = &$parameters[$key];
-            }
+                        }
 			call_user_func_array(array($query, 'bind_param'), $tmp);
 		}
 	}
