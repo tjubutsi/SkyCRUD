@@ -20,9 +20,8 @@
 			$reflection = new ReflectionClass($entityName);
 			$reflectionProperties = $reflection->getProperties();
 			
-			$parameters = [];
-			$parameterPlaceholders = [];
-			$parameterTypes = [];
+			$parameters = array();
+			$parameterPlaceholders = array();
 			
 			foreach ($reflectionProperties as $property) {
 				array_push($parameters, $property->getName());
@@ -94,13 +93,13 @@
 		}
 		
 		function where($property, $value) {
-			$reflection = new ReflectionClass($this->entityName);
-			$reflectionProperty = $reflection->getProperty($property);
-			$reflectionProperty->getName();
-			
 			$result = new $this->entityName;
+			if (!property_exists($result, $property)) {
+				return false;
+			}
+			
 			$columns = implode(", ", $this->parameters);
-			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName} WHERE {$reflectionProperty->getName()} = ?");
+			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName} WHERE {$property} = ?");
 			foreach($this->parameters as $parameter) {
 				$resultArray[$parameter] = &$result->$parameter;
 			}
