@@ -3,17 +3,20 @@
 
 	class db {
 		public $connection;
-		public $users;
-		public $clients;
+		#examples
+		#public $users;
+		#public $clients;
 		
 		function __construct() {
-			$databaseServer = "127.0.0.1";
-			$database = "skypushdev";
-			$databaseUser = "skypush";
-			$databasePassword = "skypush";
+			require_once(dirname(__FILE__) . "/config.php");
+			$databaseServer = $config["server"];
+			$database = $config["databaseName"];
+			$databaseUser = $config["username"];
+			$databasePassword = $config["password"];
 			$this->connection = new mysqli($databaseServer, $databaseUser, $databasePassword, $database);
-			$this->users = new entity("users", "user", $this->connection);
-			$this->clients = new entity("clients", "client", $this->connection);
+			#examples
+			#$this->users = new entity("users", "user", $this->connection);
+			#$this->clients = new entity("clients", "client", $this->connection);
 		}
 	}
 	
