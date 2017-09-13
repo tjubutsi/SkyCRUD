@@ -92,7 +92,36 @@
 			return $result;
 		}
 
-		function where($property, $value) {
+		function getList() {
+			$result = array();
+			$row = new $this->entityName;
+			
+			$columns = implode(", ", $this->parameters);
+			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName}");
+			foreach($this->parameters as $parameter) {
+				$resultArray[$parameter] = &$row->$parameter;
+			}
+
+			call_user_func_array(array($query, 'bind_result'), $resultArray);
+			$query->execute();
+			$query->store_result();
+			if($query->num_rows >== 1) {
+				$i = 0;
+				while ($query->fetch()) {
+					$result[$i] = $row;
+					$i++;
+				}
+			}
+			else {
+				$query->close();
+				return false;
+			}
+
+			$query->close();
+			return $result;
+		}
+
+		function getWhere($property, $value) {
 			$result = new $this->entityName;
 			if (!property_exists($result, $property)) {
 				return false;
@@ -110,6 +139,39 @@
 			$query->store_result();
 			if($query->num_rows === 1) {
 				$query->fetch();
+			}
+			else {
+				$query->close();
+				return false;
+			}
+
+			$query->close();
+			return $result;
+		}
+
+		function getListWhere($property, $value) {
+			$result = array();
+			$row = new $this->entityName;
+			if (!property_exists($row, $property)) {
+				return false;
+			}
+			
+			$columns = implode(", ", $this->parameters);
+			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName} WHERE {$property} = ?");
+			foreach($this->parameters as $parameter) {
+				$resultArray[$parameter] = &$row->$parameter;
+			}
+
+			call_user_func_array(array($query, 'bind_result'), $resultArray);
+			$query->bind_param("s", $value);
+			$query->execute();
+			$query->store_result();
+			if($query->num_rows >== 1) {
+				$i = 0;
+				while ($query->fetch()) {
+					$result[$i] = $row;
+					$i++;
+				}
 			}
 			else {
 				$query->close();
