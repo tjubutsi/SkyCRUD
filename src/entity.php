@@ -38,7 +38,7 @@
 			$columns = implode(", ", $this->parameters);
 			$query = $this->connection->prepare("INSERT INTO {$this->tableName} ({$columns}) VALUES ({$this->parameterPlaceholders})");
 			$this->bindParameters($query, $object);
-			if(!$query->execute()) {
+			if (!$query->execute()) {
 				return false;
 			}
 			$object->id = $query->insert_id;
@@ -54,7 +54,7 @@
 			$columns = implode(", ", $parameters);
 			$query = $this->connection->prepare("UPDATE {$this->tableName} SET {$columns} WHERE id = {$object->id}");
 			$this->bindParameters($query, $object);
-			if(!$query->execute()) {
+			if (!$query->execute()) {
 				$query->close();
 				return false;
 			}
@@ -72,7 +72,7 @@
 			$result = new $this->entityName;
 			$columns = implode(", ", $this->parameters);
 			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName} WHERE id = ?");
-			foreach($this->parameters as $parameter) {
+			foreach ($this->parameters as $parameter) {
 				$resultArray[$parameter] = &$result->$parameter;
 			}
 
@@ -80,7 +80,7 @@
 			$query->bind_param("i", $id);
 			$query->execute();
 			$query->store_result();
-			if($query->num_rows === 1) {
+			if ($query->num_rows === 1) {
 				$query->fetch();
 			}
 			else {
@@ -98,30 +98,22 @@
 			
 			$columns = implode(", ", $this->parameters);
 			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName}");
-			foreach($this->parameters as $parameter) {
+			foreach ($this->parameters as $parameter) {
 				$resultArray[$parameter] = &$row->$parameter;
 			}
 
 			call_user_func_array(array($query, 'bind_result'), $resultArray);
 			$query->execute();
 			$query->store_result();
-			if($query->num_rows >== 1) {
-				$i = 0;
-				while ($query->fetch()) {
-					$result[$i] = $row;
-					$i++;
-				}
-			}
-			else {
-				$query->close();
-				return false;
+			while ($query->fetch()) {
+				$result[] = unserialize(serialize($row));;
 			}
 
 			$query->close();
 			return $result;
 		}
 
-		function getWhere($property, $value) {
+		function where($property, $value) {
 			$result = new $this->entityName;
 			if (!property_exists($result, $property)) {
 				return false;
@@ -129,7 +121,7 @@
 			
 			$columns = implode(", ", $this->parameters);
 			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName} WHERE {$property} = ?");
-			foreach($this->parameters as $parameter) {
+			foreach ($this->parameters as $parameter) {
 				$resultArray[$parameter] = &$result->$parameter;
 			}
 
@@ -137,7 +129,7 @@
 			$query->bind_param("s", $value);
 			$query->execute();
 			$query->store_result();
-			if($query->num_rows === 1) {
+			if ($query->num_rows === 1) {
 				$query->fetch();
 			}
 			else {
@@ -149,16 +141,13 @@
 			return $result;
 		}
 
-		function getListWhere($property, $value) {
+		function whereList($property, $value) {
 			$result = array();
 			$row = new $this->entityName;
-			if (!property_exists($row, $property)) {
-				return false;
-			}
 			
 			$columns = implode(", ", $this->parameters);
 			$query = $this->connection->prepare("SELECT {$columns} FROM {$this->tableName} WHERE {$property} = ?");
-			foreach($this->parameters as $parameter) {
+			foreach ($this->parameters as $parameter) {
 				$resultArray[$parameter] = &$row->$parameter;
 			}
 
@@ -166,16 +155,8 @@
 			$query->bind_param("s", $value);
 			$query->execute();
 			$query->store_result();
-			if($query->num_rows >== 1) {
-				$i = 0;
-				while ($query->fetch()) {
-					$result[$i] = $row;
-					$i++;
-				}
-			}
-			else {
-				$query->close();
-				return false;
+			while ($query->fetch()) {
+				$result[] = unserialize(serialize($row));;
 			}
 
 			$query->close();
@@ -190,9 +171,10 @@
 			}
 
 			$tmp = array();
-			foreach($parameters as $key => $value) {
+			foreach ($parameters as $key => $value) {
 			    $tmp[$key] = &$parameters[$key];
-                        }
+            }
+			
 			call_user_func_array(array($query, 'bind_param'), $tmp);
 		}
 	}
