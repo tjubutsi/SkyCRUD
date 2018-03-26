@@ -34,7 +34,7 @@
 		}
 
 
-		function add($object) {
+		function add(&$object) {
 			$columns = implode(", ", $this->parameters);
 			$query = $this->connection->prepare("INSERT INTO {$this->tableName} ({$columns}) VALUES ({$this->parameterPlaceholders})");
 			$this->bindParameters($query, $object);
