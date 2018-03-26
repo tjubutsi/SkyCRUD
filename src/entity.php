@@ -76,7 +76,7 @@
 				$resultArray[$parameter] = &$result->$parameter;
 			}
 
-			call_user_func_array(array($query, 'bind_result'), $resultArray);
+			call_user_func_array(array($query, "bind_result"), $resultArray);
 			$query->bind_param("i", $id);
 			$query->execute();
 			$query->store_result();
@@ -102,7 +102,7 @@
 				$resultArray[$parameter] = &$row->$parameter;
 			}
 
-			call_user_func_array(array($query, 'bind_result'), $resultArray);
+			call_user_func_array(array($query, "bind_result"), $resultArray);
 			$query->execute();
 			$query->store_result();
 			while ($query->fetch()) {
@@ -125,7 +125,7 @@
 				$resultArray[$parameter] = &$result->$parameter;
 			}
 
-			call_user_func_array(array($query, 'bind_result'), $resultArray);
+			call_user_func_array(array($query, "bind_result"), $resultArray);
 			$query->bind_param("s", $value);
 			$query->execute();
 			$query->store_result();
@@ -151,7 +151,7 @@
 				$resultArray[$parameter] = &$row->$parameter;
 			}
 
-			call_user_func_array(array($query, 'bind_result'), $resultArray);
+			call_user_func_array(array($query, "bind_result"), $resultArray);
 			$query->bind_param("s", $value);
 			$query->execute();
 			$query->store_result();
@@ -175,6 +175,6 @@
 			    $tmp[$key] = &$parameters[$key];
             }
 			
-			call_user_func_array(array($query, 'bind_param'), $tmp);
+			call_user_func_array(array($query, "bind_param"), $tmp);
 		}
 	}
